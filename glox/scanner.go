@@ -14,6 +14,15 @@ type Scanner struct {
 	line    int
 }
 
+func NewScanner(source string) *Scanner {
+	s := Scanner{
+		source: source,
+	}
+
+	s.tokens = make([]Token, 0, 10)
+	return &s
+}
+
 func (s *Scanner) isAtEnd() bool {
 	return s.current >= len(s.source)
 }
@@ -221,44 +230,4 @@ func isAlpha(c rune) bool {
 
 func isAlphaNumeric(c rune) bool {
 	return isAlpha(c) || isDigit(c)
-}
-
-func keyword(s string) TokenType {
-	switch s {
-	case "and":
-		return AND
-	case "class":
-		return CLASS
-	case "else":
-		return ELSE
-	case "false":
-		return FALSE
-	case "for":
-		return FOR
-	case "fun":
-		return FUN
-	case "if":
-		return IF
-	case "nil":
-		return NIL
-	case "or":
-		return OR
-	case "print":
-		return PRINT
-	case "return":
-		return RETURN
-	case "super":
-		return SUPER
-	case "this":
-		return THIS
-	case "true":
-		return TRUE
-	case "var":
-		return VAR
-	case "while":
-		return WHILE
-	default:
-		return IDENTIFIER
-	}
-
 }

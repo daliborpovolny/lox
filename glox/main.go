@@ -14,7 +14,7 @@ var lox Lox = Lox{}
 
 func (l *Lox) Start(args []string) error {
 	if len(args) > 1 {
-		return fmt.Errorf("Usage: golox [script]")
+		return fmt.Errorf("usage: golox [script]")
 	} else if len(args) == 1 {
 		err := l.runFile(args[0])
 		if err != nil {
@@ -50,8 +50,11 @@ func (l *Lox) runPrompt() {
 }
 
 func (l *Lox) run(source string) {
-	fmt.Println(source)
-	return
+	scanner := NewScanner(source)
+	tokens := scanner.scanTokens()
+	for _, token := range tokens {
+		fmt.Println(token.toString())
+	}
 }
 
 func (l *Lox) error(line int, message string) {

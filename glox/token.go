@@ -12,5 +12,5 @@ type Token struct {
 }
 
 func (t Token) toString() string {
-	return fmt.Sprintf("%d %s %v", t.tokenType, t.lexeme, t.object)
+	return fmt.Sprintf("%s %s %v", tokenTypeToString(t.tokenType), t.lexeme, t.object)
 }
