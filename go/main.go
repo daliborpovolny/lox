@@ -6,64 +6,11 @@ import (
 	"os"
 )
 
-const (
-	// Single-character tokens.
-	LEFT_PAREN = iota
-	RIGHT_PAREN
-
-	LEFT_BRACE
-	RIGHT_BRACE
-
-	COMMA
-	DOT
-	MINUS
-	PLUS
-	SEMICOLON
-	SLASH
-	STAR
-
-	// One or two character tokens.
-	BANG
-	BANG_EQUAL
-
-	EQUAL
-	EQUAL_EQUAL
-
-	GREATER
-	GREATER_EQUAL
-
-	LESS
-	LESS_EQUAL
-
-	// Literals.
-	IDENTIFIER
-	STRING
-	NUMBER
-
-	// Keywords.
-	AND
-	CLASS
-	ELSE
-	FALSE
-	FUN
-	FOR
-	IF
-	NIL
-	OR
-	PRINT
-	RETURN
-	SUPER
-	THIS
-	TRUE
-	VAR
-	WHILE
-
-	EOF
-)
-
 type Lox struct {
 	hadError bool
 }
+
+var lox Lox = Lox{}
 
 func (l *Lox) Start(args []string) error {
 	if len(args) > 1 {
@@ -107,7 +54,7 @@ func (l *Lox) run(source string) {
 	return
 }
 
-func (l *Lox) reportError(line int, message string) {
+func (l *Lox) error(line int, message string) {
 	l.report(line, "", message)
 }
 
