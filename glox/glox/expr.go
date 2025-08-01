@@ -5,6 +5,7 @@ type Visitor interface {
 	VisitGroupingExpr(expr Grouping) any
 	VisitLiteralExpr(expr Literal) any
 	VisitUnaryExpr(expr Unary) any
+	VisitTernaryExpr(expr Ternary) any
 }
 
 type Expr interface {
@@ -43,4 +44,14 @@ type Unary struct {
 
 func (u Unary) Accept(visitor Visitor) any {
 	return visitor.VisitUnaryExpr(u)
+}
+
+type Ternary struct {
+	condition Expr
+	outcome1  Expr
+	outcome2  Expr
+}
+
+func (t Ternary) Accept(visitor Visitor) any {
+	return visitor.VisitTernaryExpr(t)
 }

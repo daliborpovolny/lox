@@ -12,6 +12,10 @@ func (a AstPrinter) Print(expr Expr) any {
 	return expr.Accept(a).(string)
 }
 
+func (a AstPrinter) VisitTernaryExpr(expr Ternary) any {
+	return a.parenthesize("ternary", expr.condition, expr.outcome1, expr.outcome2)
+}
+
 func (a AstPrinter) VisitBinaryExpr(expr Binary) any {
 	return a.parenthesize(expr.operator.lexeme, expr.left, expr.right)
 }

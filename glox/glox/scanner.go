@@ -62,6 +62,10 @@ func (s *Scanner) scanToken() {
 		s.addToken(SEMICOLON, nil)
 	case '*':
 		s.addToken(STAR, nil)
+	case ':': // ternary
+		s.addToken(COLON, nil)
+	case '?': // ternary
+		s.addToken(QUESTION_MARK, nil)
 	case '!':
 		isNE := s.match('=')
 		if isNE {

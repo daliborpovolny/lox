@@ -19,6 +19,7 @@ func main() {
 		"Grouping	: Expr expression",
 		"Literal	: Object value",
 		"Unary 		: Token operator, Expr right",
+		"Ternary	: Expr condition, Expr outcome1, Expr outcome2",
 	})
 	if err != nil {
 		fmt.Println(err)

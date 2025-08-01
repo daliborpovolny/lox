@@ -18,6 +18,9 @@ const (
 	SLASH
 	STAR
 
+	QUESTION_MARK // for ternary
+	COLON         // for ternary
+
 	// One or two character tokens.
 	BANG
 	BANG_EQUAL

@@ -1,3 +1,5 @@
+-- original grammar
+
 expression -> equality ;
 
 equality -> comparision ( ( "!=" | "==" ) comparision )* ;
@@ -13,6 +15,40 @@ unary -> ( "!" | "-" ) unary | primary ;
 primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
 
 
+equality
+
+comparision
+
+adition
+
+multiplication
+
+unary
+
+
+
+-- with challenges of chapter 6
+
+expression -> nondot_expression ( "," nondot_expression )* ;
+
+nondot_expression -> ternary ;
+
+ternary -> equality "?" equality ":" equality | equality ;
+
+equality -> comparision ( ( "!=" | "==" ) comparision )* ;
+
+comparision -> term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+
+term -> factor ( ( "-" | "+" ) factor )* ;
+
+factor -> unary ( ( "\" | "*" ) unary )* ;
+
+unary -> ( "!" | "-" ) unary | primary ;
+
+primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
+
+
+ternary
 
 equality
 

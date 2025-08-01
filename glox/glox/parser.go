@@ -23,7 +23,22 @@ func (p *Parser) Parse() (expr Expr) {
 }
 
 func (p *Parser) expression() Expr {
-	return p.equality()
+	return p.ternary()
+}
+
+func (p *Parser) ternary() Expr {
+	expr := p.equality()
+	if p.match(QUESTION_MARK) {
+		outcome1 := p.equality()
+		p.consume(COLON, "? denotes a ternary operator: expected expr ? expr : expr")
+		outcome2 := p.equality()
+		return Ternary{
+			condition: expr,
+			outcome1:  outcome1,
+			outcome2:  outcome2,
+		}
+	}
+	return expr
 }
 
 func (p *Parser) equality() Expr {
