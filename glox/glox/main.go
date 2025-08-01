@@ -52,9 +52,19 @@ func (l *Lox) runPrompt() {
 func (l *Lox) run(source string) {
 	scanner := NewScanner(source)
 	tokens := scanner.scanTokens()
-	for _, token := range tokens {
-		fmt.Println(token.toString())
+	// for _, token := range tokens {
+	// 	fmt.Println(token.toString())
+	// }
+	// fmt.Printf("scanned\nparsing...\n")
+
+	parser := NewParser(tokens)
+	expression := parser.Parse()
+	if l.hadError {
+		return
 	}
+
+	astPrinter := AstPrinter{}
+	fmt.Println(astPrinter.Print(expression))
 }
 
 func (l *Lox) error(line int, message string) {
@@ -66,9 +76,41 @@ func (l *Lox) report(line int, where string, message string) {
 	l.hadError = true
 }
 
+func (l *Lox) errorToken(token Token, message string) {
+	if token.tokenType == EOF {
+		l.report(token.line, " at end", message)
+	} else {
+		l.report(token.line, "at '"+token.lexeme+"'", message)
+	}
+}
+
 func main() {
-	l := Lox{}
-	err := l.Start(os.Args[1:])
+	// // Represents: (1 + 2)
+	// left := &Binary{
+	// 	left:     &Literal{value: 1},
+	// 	operator: Token{lexeme: "+"},
+	// 	right:    &Literal{value: 2},
+	// }
+
+	// // Represents: (3 - 4)
+	// right := &Binary{
+	// 	left:     &Literal{value: 3},
+	// 	operator: Token{lexeme: "-"},
+	// 	right:    &Literal{value: 4},
+	// }
+
+	// // Represents: ( (1 + 2) * (3 - 4) )
+	// expr := &Binary{
+	// 	left:     left,
+	// 	operator: Token{lexeme: "*"},
+	// 	right:    right,
+	// }
+
+	// visitor := AstPrinter{}
+	// fmt.Println(visitor.Print(expr))
+	// os.Exit(0)
+
+	err := lox.Start(os.Args[1:])
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(64)
