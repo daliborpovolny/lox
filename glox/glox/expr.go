@@ -6,6 +6,7 @@ type Visitor interface {
 	VisitLiteralExpr(expr Literal) any
 	VisitUnaryExpr(expr Unary) any
 	VisitTernaryExpr(expr Ternary) any
+	VisitCommaExpr(expr Comma) any
 }
 
 type Expr interface {
@@ -54,4 +55,12 @@ type Ternary struct {
 
 func (t Ternary) Accept(visitor Visitor) any {
 	return visitor.VisitTernaryExpr(t)
+}
+
+type Comma struct {
+	exprs []Expr
+}
+
+func (c Comma) Accept(visitor Visitor) any {
+	return visitor.VisitCommaExpr(c)
 }

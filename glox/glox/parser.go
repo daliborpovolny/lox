@@ -23,6 +23,21 @@ func (p *Parser) Parse() (expr Expr) {
 }
 
 func (p *Parser) expression() Expr {
+	expr := p.nonCommaExpression()
+	if p.peek().tokenType == COMMA {
+		commaExpr := Comma{
+			make([]Expr, 0),
+		}
+
+		for p.match(COMMA) {
+			commaExpr.exprs = append(commaExpr.exprs, p.nonCommaExpression())
+		}
+	}
+
+	return expr
+}
+
+func (p *Parser) nonCommaExpression() Expr {
 	return p.ternary()
 }
 

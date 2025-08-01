@@ -12,6 +12,11 @@ func (a AstPrinter) Print(expr Expr) any {
 	return expr.Accept(a).(string)
 }
 
+func (a AstPrinter) VisitCommaExpr(expr Comma) any {
+	fmt.Println("printing comma expr", expr.exprs)
+	return a.parenthesize("comma", expr.exprs...)
+}
+
 func (a AstPrinter) VisitTernaryExpr(expr Ternary) any {
 	return a.parenthesize("ternary", expr.condition, expr.outcome1, expr.outcome2)
 }
