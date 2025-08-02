@@ -2,7 +2,31 @@ package main
 
 import "fmt"
 
+type RuntimeError struct {
+	Message string
+	Token   Token // optional, if you want context
+}
+
+func (e *RuntimeError) Error() string {
+	return fmt.Sprintf("Runtime error at '%v': %s", e.Token.lexeme, e.Message)
+}
+
 type Interpreter struct{}
+
+func (i *Interpreter) Interpret(expr Expr) {
+	defer func() {
+		if r := recover(); r != nil {
+			if runtimeErr, ok := r.(*RuntimeError); ok {
+				lox.runTimeError
+				fmt.Println(runtimeErr.Error())
+			} else {
+				panic(r)
+			}
+		}
+	}()
+
+	i.evaluate(expr)
+}
 
 func (i Interpreter) VisitLiteralExpr(expr Literal) Object {
 	return expr.value
@@ -49,21 +73,40 @@ func (i Interpreter) VisitBinaryExpr(expr Binary) Object {
 	right := i.evaluate(expr.right)
 
 	switch expr.operator.tokenType {
-	case MINUS:
-		n_left, _ := left.(float64)
-		n_right, _ := right.(float64)
+	case MINUS,
+		SLASH,
+		STAR,
+		GREATER,
+		GREATER_EQUAL,
+		LESS,
+		LESS_EQUAL:
 
-		return n_left - n_right
-	case SLASH:
-		n_left, _ := left.(float64)
-		n_right, _ := right.(float64)
+		leftNumber, leftNumberOk := left.(float64)
+		rightNumber, rightNumberOk := right.(float64)
 
-		return n_left / n_right
-	case STAR:
-		n_left, _ := left.(float64)
-		n_right, _ := right.(float64)
+		if !(leftNumberOk && rightNumberOk) {
+			fmt.Println("oh no")
+			return nil
+		}
 
-		return n_left * n_right
+		switch expr.operator.tokenType {
+		case MINUS:
+			return leftNumber - rightNumber
+		case SLASH:
+			return leftNumber / rightNumber
+		case STAR:
+			return leftNumber * rightNumber
+		case GREATER:
+			return leftNumber > rightNumber
+		case GREATER_EQUAL:
+			return leftNumber >= rightNumber
+		case LESS:
+			return leftNumber < rightNumber
+		case LESS_EQUAL:
+			return leftNumber <= rightNumber
+		default:
+			return nil
+		}
 	case PLUS:
 
 		leftString, leftStringOk := left.(string)
