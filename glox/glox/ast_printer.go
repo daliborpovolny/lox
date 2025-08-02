@@ -13,7 +13,6 @@ func (a AstPrinter) Print(expr Expr) any {
 }
 
 func (a AstPrinter) VisitCommaExpr(expr Comma) any {
-	fmt.Println("printing comma expr", expr.exprs)
 	return a.parenthesize("comma", expr.exprs...)
 }
 

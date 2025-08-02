@@ -29,9 +29,9 @@ unary
 
 -- with challenges of chapter 6
 
-expression -> nondot_expression ( "," nondot_expression )* ;
+expression -> non_comma_expression ( "," non_comma_expression )* ;
 
-nondot_expression -> ternary ;
+non_comma_expression -> ternary ;
 
 ternary -> equality "?" equality ":" equality | equality ;
 
@@ -47,6 +47,8 @@ unary -> ( "!" | "-" ) unary | primary ;
 
 primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
 
+
+comma
 
 ternary
 

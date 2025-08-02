@@ -26,14 +26,13 @@ func (p *Parser) expression() Expr {
 	expr := p.nonCommaExpression()
 	if p.peek().tokenType == COMMA {
 		commaExpr := Comma{
-			make([]Expr, 0),
+			[]Expr{expr},
 		}
-
 		for p.match(COMMA) {
 			commaExpr.exprs = append(commaExpr.exprs, p.nonCommaExpression())
 		}
+		return commaExpr
 	}
-
 	return expr
 }
 
