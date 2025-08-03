@@ -84,7 +84,9 @@ func (l *Lox) errorToken(token Token, message string) {
 	}
 }
 
-func (l *Lox) runTimeError()
+func (l *Lox) runTimeError() {
+
+}
 
 func main() {
 	// // Represents: (1 + 2)
