@@ -42,14 +42,15 @@ func (p *Parser) nonCommaExpression() Expr {
 
 func (p *Parser) ternary() Expr {
 	expr := p.equality()
+	
 	if p.match(QUESTION_MARK) {
 		outcome1 := p.equality()
 		p.consume(COLON, "? denotes a ternary operator: expected expr ? expr : expr")
-		outcome2 := p.equality()
+		outcome2 := p.ternary()
 		return Ternary{
 			condition: expr,
-			outcome1:  outcome1,
-			outcome2:  outcome2,
+			outcome1: outcome1,
+			outcome2: outcome2,
 		}
 	}
 	return expr

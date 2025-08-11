@@ -33,7 +33,7 @@ expression -> non_comma_expression ( "," non_comma_expression )* ;
 
 non_comma_expression -> ternary ;
 
-ternary -> equality "?" equality ":" equality | equality ;
+ternary -> equality "?" equality ":" ternary | equality ;
 
 equality -> comparision ( ( "!=" | "==" ) comparision )* ;
 
