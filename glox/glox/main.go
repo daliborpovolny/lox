@@ -12,6 +12,8 @@ type Lox struct {
 	hadRuntimeError bool
 }
 
+var printParseTree bool = false
+
 var lox Lox = Lox{}
 
 func (l *Lox) Start(args []string) error {
@@ -65,8 +67,10 @@ func (l *Lox) run(source string) {
 		return
 	}
 
-	astPrinter := AstPrinter{}
-	fmt.Println(astPrinter.Print(expression))
+	if printParseTree {
+		astPrinter := AstPrinter{}
+		fmt.Println(astPrinter.Print(expression))
+	}
 
 	intepreter := Interpreter{}
 	intepreter.Interpret(expression)
@@ -91,7 +95,7 @@ func (l *Lox) errorToken(token Token, message string) {
 }
 
 func (l *Lox) runTimeError(rErr RuntimeError) {
-	fmt.Fprintln(os.Stderr, rErr.Message+"\n[line + "+strconv.Itoa(rErr.Token.line)+"]")
+	fmt.Fprintln(os.Stderr, rErr.Message+"\n[line "+strconv.Itoa(rErr.Token.line)+"]")
 	l.hadRuntimeError = false
 }
 

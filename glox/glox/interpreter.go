@@ -33,7 +33,7 @@ func (i *Interpreter) VisitLiteralExpr(expr Literal) any {
 }
 
 func (i *Interpreter) VisitGroupingExpr(expr Grouping) any {
-	fmt.Println("visiting grouping")
+	// fmt.Println("visiting grouping")
 	return i.evaluate(expr)
 }
 
@@ -42,12 +42,16 @@ func (i *Interpreter) evaluate(expr Expr) any {
 }
 
 func (i *Interpreter) VisitUnaryExpr(expr Unary) any {
-	fmt.Println("visiting unary")
+	// fmt.Println("visiting unary")
 	right := i.evaluate(expr.right)
 
 	switch expr.operator.tokenType {
 	case MINUS:
-		n, _ := right.(float64)
+		n, ok := right.(float64)
+		if !ok {
+			i.raiseNumberOperands(expr.operator, "Operand must be a number.")
+		}
+
 		return -n
 	case BANG:
 		return !i.isTruthy(right)
@@ -55,6 +59,22 @@ func (i *Interpreter) VisitUnaryExpr(expr Unary) any {
 		fmt.Println("unknown operator should be unreachable", right)
 		return nil
 	}
+}
+
+func (i *Interpreter) raiseNumberOperands(operator Token, operands ...any) {
+	var message string
+	if len(operands) == 1 {
+		message = "Operand must be a number."
+	} else {
+		message = "Operands must be numbers."
+	}
+
+	var err error = &RuntimeError{
+		message,
+		operator,
+	}
+
+	panic(err)
 }
 
 func (i *Interpreter) isTruthy(obj Object) bool {
@@ -71,7 +91,7 @@ func (i *Interpreter) isTruthy(obj Object) bool {
 }
 
 func (i *Interpreter) VisitBinaryExpr(expr Binary) any {
-	fmt.Println("visiting binary")
+	// fmt.Println("visiting binary")
 	left := i.evaluate(expr.left)
 	right := i.evaluate(expr.right)
 
@@ -88,7 +108,7 @@ func (i *Interpreter) VisitBinaryExpr(expr Binary) any {
 		rightNumber, rightNumberOk := right.(float64)
 
 		if !(leftNumberOk && rightNumberOk) {
-			fmt.Println("oh no")
+			i.raiseNumberOperands(expr.operator, left, right)
 			return nil
 		}
 
@@ -126,11 +146,19 @@ func (i *Interpreter) VisitBinaryExpr(expr Binary) any {
 			return leftNumber + rightNumber
 		}
 
-		fmt.Println("uh oh")
-		return nil
+		var err error = &RuntimeError{
+			"Operands must be two numbers or two strings.",
+			expr.operator,
+		}
+		panic(err)
+
 	default:
 		fmt.Println("unreachable unkonwn op")
-		return nil
+		var err RuntimeError = RuntimeError{
+			"Unknown operator, should have failed in parsing.",
+			expr.operator,
+		}
+		panic(err)
 	}
 }
 
