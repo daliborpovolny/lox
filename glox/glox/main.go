@@ -4,10 +4,12 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 )
 
 type Lox struct {
-	hadError bool
+	hadError        bool
+	hadRuntimeError bool
 }
 
 var lox Lox = Lox{}
@@ -37,6 +39,10 @@ func (l *Lox) runFile(path string) error {
 		os.Exit(65)
 	}
 
+	if l.hadRuntimeError {
+		os.Exit(70)
+	}
+
 	return nil
 }
 
@@ -52,10 +58,6 @@ func (l *Lox) runPrompt() {
 func (l *Lox) run(source string) {
 	scanner := NewScanner(source)
 	tokens := scanner.scanTokens()
-	// for _, token := range tokens {
-	// 	fmt.Println(token.toString())
-	// }
-	// fmt.Printf("scanned\nparsing...\n")
 
 	parser := NewParser(tokens)
 	expression := parser.Parse()
@@ -65,6 +67,10 @@ func (l *Lox) run(source string) {
 
 	astPrinter := AstPrinter{}
 	fmt.Println(astPrinter.Print(expression))
+
+	intepreter := Interpreter{}
+	intepreter.Interpret(expression)
+
 }
 
 func (l *Lox) error(line int, message string) {
@@ -84,36 +90,12 @@ func (l *Lox) errorToken(token Token, message string) {
 	}
 }
 
-func (l *Lox) runTimeError() {
-
+func (l *Lox) runTimeError(rErr RuntimeError) {
+	fmt.Fprintln(os.Stderr, rErr.Message+"\n[line + "+strconv.Itoa(rErr.Token.line)+"]")
+	l.hadRuntimeError = false
 }
 
 func main() {
-	// // Represents: (1 + 2)
-	// left := &Binary{
-	// 	left:     &Literal{value: 1},
-	// 	operator: Token{lexeme: "+"},
-	// 	right:    &Literal{value: 2},
-	// }
-
-	// // Represents: (3 - 4)
-	// right := &Binary{
-	// 	left:     &Literal{value: 3},
-	// 	operator: Token{lexeme: "-"},
-	// 	right:    &Literal{value: 4},
-	// }
-
-	// // Represents: ( (1 + 2) * (3 - 4) )
-	// expr := &Binary{
-	// 	left:     left,
-	// 	operator: Token{lexeme: "*"},
-	// 	right:    right,
-	// }
-
-	// visitor := AstPrinter{}
-	// fmt.Println(visitor.Print(expr))
-	// os.Exit(0)
-
 	err := lox.Start(os.Args[1:])
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
