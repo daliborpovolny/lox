@@ -43,7 +43,7 @@ func (i *Interpreter) evaluate(expr Expr) any {
 
 func (i *Interpreter) VisitUnaryExpr(expr Unary) any {
 	fmt.Println("visiting unary")
-	right := i.evaluate(expr)
+	right := i.evaluate(expr.right)
 
 	switch expr.operator.tokenType {
 	case MINUS:
