@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+	"strings"
+)
 
 type RuntimeError struct {
 	Message string
@@ -49,7 +53,7 @@ func (i *Interpreter) VisitUnaryExpr(expr Unary) any {
 	case MINUS:
 		n, ok := right.(float64)
 		if !ok {
-			i.raiseNumberOperands(expr.operator, "Operand must be a number.")
+			i.raiseNumberOperands(expr.operator, right)
 		}
 
 		return -n
@@ -116,6 +120,14 @@ func (i *Interpreter) VisitBinaryExpr(expr Binary) any {
 		case MINUS:
 			return leftNumber - rightNumber
 		case SLASH:
+			if rightNumber == 0 {
+				var err error = &RuntimeError{
+					"Cannot divide by zero.",
+					expr.operator,
+				}
+				panic(err)
+			}
+
 			return leftNumber / rightNumber
 		case STAR:
 			return leftNumber * rightNumber
@@ -146,8 +158,20 @@ func (i *Interpreter) VisitBinaryExpr(expr Binary) any {
 			return leftNumber + rightNumber
 		}
 
+		if leftStringOk && rightNumberOk {
+			rightString = strconv.FormatFloat(rightNumber, 'f', 6, 64)
+			rightString = strings.TrimSuffix(rightString, ".0")
+			return leftString + rightString
+		}
+
+		if rightStringOk && leftNumberOk {
+			leftString = strconv.FormatFloat(leftNumber, 'f', 6, 64)
+			leftString = strings.TrimSuffix(leftString, ".000000")
+			return leftString + rightString
+		}
+
 		var err error = &RuntimeError{
-			"Operands must be two numbers or two strings.",
+			"Operands must be two numbers or strings and a number.",
 			expr.operator,
 		}
 		panic(err)
