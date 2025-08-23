@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type Parser struct {
 	tokens  []Token
 	current int
@@ -12,14 +14,38 @@ func NewParser(tokens []Token) *Parser {
 	}
 }
 
-func (p *Parser) Parse() (expr Expr) {
+func (p *Parser) Parse() []Stmt {
 	defer func() {
 		if r := recover(); r != nil {
-			expr = nil
+			fmt.Println(r)
 		}
 	}()
 
-	return p.expression()
+	statements := make([]Stmt, 0, 10)
+	for !p.isAtEnd() {
+		statements = append(statements, p.statement())
+	}
+
+	return statements
+}
+
+func (p *Parser) statement() Stmt {
+	if p.match(PRINT) {
+		return p.printStatement()
+	}
+	return p.expressionStatement()
+}
+
+func (p *Parser) printStatement() Stmt {
+	value := p.expression()
+	p.consume(SEMICOLON, "Expect ';' after value")
+	return Print{value}
+}
+
+func (p *Parser) expressionStatement() Stmt {
+	expr := p.expression()
+	p.consume(SEMICOLON, "Expect ';' after expression")
+	return Expression{expr}
 }
 
 func (p *Parser) expression() Expr {

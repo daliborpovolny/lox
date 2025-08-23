@@ -1,6 +1,6 @@
 package main
 
-type Visitor interface {
+type exprVisitor interface {
 	VisitBinaryExpr(expr Binary) any
 	VisitGroupingExpr(expr Grouping) any
 	VisitLiteralExpr(expr Literal) any
@@ -10,7 +10,7 @@ type Visitor interface {
 }
 
 type Expr interface {
-	Accept(visitor Visitor) any
+	Accept(visitor exprVisitor) any
 }
 type Binary struct {
 	left     Expr
@@ -18,7 +18,7 @@ type Binary struct {
 	right    Expr
 }
 
-func (b Binary) Accept(visitor Visitor) any {
+func (b Binary) Accept(visitor exprVisitor) any {
 	return visitor.VisitBinaryExpr(b)
 }
 
@@ -26,7 +26,7 @@ type Grouping struct {
 	expression Expr
 }
 
-func (g Grouping) Accept(visitor Visitor) any {
+func (g Grouping) Accept(visitor exprVisitor) any {
 	return visitor.VisitGroupingExpr(g)
 }
 
@@ -34,7 +34,7 @@ type Literal struct {
 	value Object
 }
 
-func (l Literal) Accept(visitor Visitor) any {
+func (l Literal) Accept(visitor exprVisitor) any {
 	return visitor.VisitLiteralExpr(l)
 }
 
@@ -43,7 +43,7 @@ type Unary struct {
 	right    Expr
 }
 
-func (u Unary) Accept(visitor Visitor) any {
+func (u Unary) Accept(visitor exprVisitor) any {
 	return visitor.VisitUnaryExpr(u)
 }
 
@@ -53,7 +53,7 @@ type Ternary struct {
 	outcome2  Expr
 }
 
-func (t Ternary) Accept(visitor Visitor) any {
+func (t Ternary) Accept(visitor exprVisitor) any {
 	return visitor.VisitTernaryExpr(t)
 }
 
@@ -61,6 +61,6 @@ type Comma struct {
 	exprs []Expr
 }
 
-func (c Comma) Accept(visitor Visitor) any {
+func (c Comma) Accept(visitor exprVisitor) any {
 	return visitor.VisitCommaExpr(c)
 }

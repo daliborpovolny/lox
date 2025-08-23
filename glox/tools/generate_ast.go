@@ -14,6 +14,7 @@ func main() {
 	}
 
 	outputDir := os.Args[1]
+
 	err := defineAst(outputDir, "Expr", []string{
 		"Binary		: Expr left, Token operator, Expr right",
 		"Grouping	: Expr expression",
@@ -26,6 +27,16 @@ func main() {
 		fmt.Println(err)
 		panic(err)
 	}
+
+	err = defineAst(outputDir, "Stmt", []string{
+		"Expression	: Expr expression",
+		"Print		: Expr expression",
+	})
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
+	}
+
 }
 
 func defineAst(outDir, baseName string, types []string) error {
@@ -42,10 +53,10 @@ func defineAst(outDir, baseName string, types []string) error {
 	fmt.Fprintln(f, "")
 
 	// visitor interface
-	fmt.Fprintln(f, "type Visitor interface {")
+	fmt.Fprintln(f, "type "+strings.ToLower(baseName)+"Visitor interface {")
 	for _, t := range types {
 		name := strings.TrimSpace(strings.Split(t, ":")[0])
-		fmt.Fprintln(f, "Visit"+name+"Expr(expr "+name+") any")
+		fmt.Fprintln(f, "Visit"+name+baseName+"("+strings.ToLower(baseName)+" "+name+") any")
 	}
 	fmt.Fprintln(f, "}")
 
@@ -53,7 +64,7 @@ func defineAst(outDir, baseName string, types []string) error {
 
 	// expr interface
 	fmt.Fprintln(f, "type "+baseName+" interface{")
-	fmt.Fprintln(f, "Accept(visitor Visitor) any")
+	fmt.Fprintln(f, "Accept(visitor "+strings.ToLower(baseName)+"Visitor) any")
 	fmt.Fprintln(f, "}")
 
 	// structs and their functions
@@ -76,8 +87,8 @@ func defineAst(outDir, baseName string, types []string) error {
 		fmt.Fprintf(f, "}\n\n")
 
 		// function
-		fmt.Fprintln(f, "func ("+strings.ToLower(name)[:1]+" "+name+") Accept(visitor Visitor) any {")
-		fmt.Fprintln(f, "return visitor.Visit"+name+"Expr("+strings.ToLower(name)[:1]+")")
+		fmt.Fprintln(f, "func ("+strings.ToLower(name)[:1]+" "+name+") Accept(visitor "+strings.ToLower(baseName)+"Visitor) any {")
+		fmt.Fprintln(f, "return visitor.Visit"+name+baseName+"("+strings.ToLower(name)[:1]+")")
 		fmt.Fprintln(f, "}")
 
 	}

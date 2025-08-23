@@ -17,19 +17,48 @@ func (e *RuntimeError) Error() string {
 
 type Interpreter struct{}
 
-func (i *Interpreter) Interpret(expr Expr) {
+func (i *Interpreter) Interpret(statements []Stmt) {
 	defer func() {
 		if r := recover(); r != nil {
 			if runtimeErr, ok := r.(*RuntimeError); ok {
 				lox.runTimeError(*runtimeErr)
-				// fmt.Println(runtimeErr.Error())
 			} else {
 				panic(r)
 			}
 		}
 	}()
 
-	fmt.Println(i.evaluate(expr))
+	for _, stmt := range statements {
+		i.execute(stmt)
+	}
+
+	// defer func() {
+	// 	if r := recover(); r != nil {
+	// 		if runtimeErr, ok := r.(*RuntimeError); ok {
+	// 			lox.runTimeError(*runtimeErr)
+	// 			// fmt.Println(runtimeErr.Error())
+	// 		} else {
+	// 			panic(r)
+	// 		}
+	// 	}
+	// }()
+
+	// fmt.Println(i.evaluate(expr))
+}
+
+func (i *Interpreter) execute(stmt Stmt) {
+	stmt.Accept(i)
+}
+
+func (i *Interpreter) VisitExpressionStmt(stmt Expression) any {
+	i.evaluate(stmt.expression)
+	return nil
+}
+
+func (i *Interpreter) VisitPrintStmt(stmt Print) any {
+	value := i.evaluate(stmt.expression)
+	fmt.Println(value)
+	return nil
 }
 
 func (i *Interpreter) VisitLiteralExpr(expr Literal) any {
@@ -160,7 +189,7 @@ func (i *Interpreter) VisitBinaryExpr(expr Binary) any {
 
 		if leftStringOk && rightNumberOk {
 			rightString = strconv.FormatFloat(rightNumber, 'f', 6, 64)
-			rightString = strings.TrimSuffix(rightString, ".0")
+			rightString = strings.TrimSuffix(rightString, ".000000")
 			return leftString + rightString
 		}
 
