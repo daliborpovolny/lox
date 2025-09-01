@@ -61,3 +61,28 @@ adition
 multiplication
 
 unary
+
+-- with print statement
+
+program -> statement* EOF ;
+
+statement -> exprtStmt | printStmt ;
+
+exprStmt -> expression ";" ;
+
+printStmt -> "print" expression ";" ;
+
+-- with global vars
+
+program -> declaration* EOF ;
+
+declaration -> varDecl | statement ;
+
+varDecl -> "var" IDENTIFIER ( "=" expression )? ";" ;
+
+statement -> exprtStmt | printStmt ;
+
+exprStmt -> expression ";" ;
+
+printStmt -> "print" expression ";" ;
+

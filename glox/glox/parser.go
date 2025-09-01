@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 type Parser struct {
 	tokens  []Token
 	current int
@@ -17,7 +15,7 @@ func NewParser(tokens []Token) *Parser {
 func (p *Parser) Parse() []Stmt {
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Println(r)
+			// fmt.Println(r)
 		}
 	}()
 
@@ -151,7 +149,7 @@ func (p *Parser) primary() Expr {
 	}
 
 	p.err(p.peek(), "Expect expression")
-	panic("Expect expression")
+	panic("")
 }
 
 func (p *Parser) consume(tokenType TokenType, message string) Token {

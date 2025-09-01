@@ -31,19 +31,6 @@ func (i *Interpreter) Interpret(statements []Stmt) {
 	for _, stmt := range statements {
 		i.execute(stmt)
 	}
-
-	// defer func() {
-	// 	if r := recover(); r != nil {
-	// 		if runtimeErr, ok := r.(*RuntimeError); ok {
-	// 			lox.runTimeError(*runtimeErr)
-	// 			// fmt.Println(runtimeErr.Error())
-	// 		} else {
-	// 			panic(r)
-	// 		}
-	// 	}
-	// }()
-
-	// fmt.Println(i.evaluate(expr))
 }
 
 func (i *Interpreter) execute(stmt Stmt) {
@@ -66,7 +53,6 @@ func (i *Interpreter) VisitLiteralExpr(expr Literal) any {
 }
 
 func (i *Interpreter) VisitGroupingExpr(expr Grouping) any {
-	// fmt.Println("visiting grouping")
 	return i.evaluate(expr)
 }
 
@@ -75,7 +61,7 @@ func (i *Interpreter) evaluate(expr Expr) any {
 }
 
 func (i *Interpreter) VisitUnaryExpr(expr Unary) any {
-	// fmt.Println("visiting unary")
+
 	right := i.evaluate(expr.right)
 
 	switch expr.operator.tokenType {
@@ -123,8 +109,18 @@ func (i *Interpreter) isTruthy(obj Object) bool {
 	return true
 }
 
+func (i *Interpreter) isEqual(a Object, b Object) bool { //todo simplify, this is go not java
+	if a == nil && b == nil {
+		return true
+	}
+	if a == nil {
+		return false
+	}
+	return a == b
+}
+
 func (i *Interpreter) VisitBinaryExpr(expr Binary) any {
-	// fmt.Println("visiting binary")
+
 	left := i.evaluate(expr.left)
 	right := i.evaluate(expr.right)
 
@@ -204,9 +200,12 @@ func (i *Interpreter) VisitBinaryExpr(expr Binary) any {
 			expr.operator,
 		}
 		panic(err)
-
+	case BANG_EQUAL:
+		return !i.isEqual(left, right)
+	case EQUAL_EQUAL:
+		return i.isEqual(left, right)
 	default:
-		fmt.Println("unreachable unkonwn op")
+		fmt.Println("Unreachable unknown operator:", expr.operator.lexeme)
 		var err RuntimeError = RuntimeError{
 			"Unknown operator, should have failed in parsing.",
 			expr.operator,

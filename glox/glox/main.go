@@ -66,7 +66,7 @@ func (l *Lox) run(source string) {
 	if l.hadError {
 		return
 	}
-	fmt.Println("succesfully parsed")
+	// fmt.Println("succesfully parsed")
 
 	// if printParseTree {
 	// 	astPrinter := AstPrinter{}
@@ -75,7 +75,7 @@ func (l *Lox) run(source string) {
 
 	intepreter := Interpreter{}
 	intepreter.Interpret(statements)
-	fmt.Println("succesfully interpreted")
+	// fmt.Println("succesfully interpreted")
 
 }
 
