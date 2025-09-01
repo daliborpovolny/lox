@@ -22,6 +22,7 @@ func main() {
 		"Unary 		: Token operator, Expr right",
 		"Ternary	: Expr condition, Expr outcome1, Expr outcome2",
 		"Comma		: []Expr exprs",
+		"Variable	: Token name",
 	})
 	if err != nil {
 		fmt.Println(err)
@@ -31,6 +32,7 @@ func main() {
 	err = defineAst(outputDir, "Stmt", []string{
 		"Expression	: Expr expression",
 		"Print		: Expr expression",
+		"Var		: Token name, Expr initializer",
 	})
 	if err != nil {
 		fmt.Println(err)

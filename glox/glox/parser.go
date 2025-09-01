@@ -1,5 +1,16 @@
 package main
 
+import "fmt"
+
+type ParseError struct {
+	Message string
+	Token   Token
+}
+
+func (e *ParseError) Error() string {
+	return fmt.Sprintf("Parse error at '%v': %s", e.Token.lexeme, e.Message)
+}
+
 type Parser struct {
 	tokens  []Token
 	current int
@@ -13,18 +24,54 @@ func NewParser(tokens []Token) *Parser {
 }
 
 func (p *Parser) Parse() []Stmt {
+	statements := make([]Stmt, 0, 10)
+	for !p.isAtEnd() {
+		statements = append(statements, p.declaration())
+	}
+
+	fmt.Println(len(statements))
+
+	fmt.Println("returning from Parse")
+
+	return statements
+}
+
+func (p *Parser) declaration() Stmt {
 	defer func() {
 		if r := recover(); r != nil {
-			// fmt.Println(r)
+			if _, ok := r.(*ParseError); ok {
+				fmt.Println("synchronizing...")
+				p.synchronize()
+			} else {
+				panic(r)
+			}
 		}
 	}()
 
-	statements := make([]Stmt, 0, 10)
-	for !p.isAtEnd() {
-		statements = append(statements, p.statement())
+	if p.match(VAR) {
+		fmt.Println("trying var")
+		return p.varDeclaration()
 	}
 
-	return statements
+	fmt.Println("trying statement")
+	return p.statement()
+}
+
+func (p *Parser) varDeclaration() Stmt {
+	var name Token = p.consume(IDENTIFIER, "Expect variable name.")
+
+	var initializer Expr
+	if p.match(EQUAL) {
+		initializer = p.expression()
+	}
+
+	p.consume(SEMICOLON, "Expect ';' after variable declaration.")
+	fmt.Println("found semicolon")
+
+	return Var{
+		name,
+		initializer,
+	}
 }
 
 func (p *Parser) statement() Stmt {
@@ -142,14 +189,18 @@ func (p *Parser) primary() Expr {
 		return Literal{p.previous().object}
 	}
 
+	if p.match(IDENTIFIER) {
+		return Variable{p.previous()}
+	}
+
 	if p.match(LEFT_PAREN) {
 		expr := p.expression()
 		p.consume(RIGHT_PAREN, "Expect ')' after expression")
 		return Grouping{expr}
 	}
 
-	p.err(p.peek(), "Expect expression")
-	panic("")
+	p.error(p.peek(), "Expect expression.")
+	panic("") // unreachable
 }
 
 func (p *Parser) consume(tokenType TokenType, message string) Token {
@@ -157,12 +208,18 @@ func (p *Parser) consume(tokenType TokenType, message string) Token {
 		return p.advance()
 	}
 
-	p.err(p.peek(), message)
+	p.error(p.peek(), message)
 	return Token{}
 }
 
-func (p *Parser) err(token Token, message string) {
+func (p *Parser) error(token Token, message string) {
+	var err = &ParseError{
+		message,
+		token,
+	}
+
 	lox.errorToken(token, message)
+	panic(err)
 }
 
 func (p *Parser) synchronize() {

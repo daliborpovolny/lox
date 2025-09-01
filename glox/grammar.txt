@@ -86,3 +86,7 @@ exprStmt -> expression ";" ;
 
 printStmt -> "print" expression ";" ;
 
+
+// we must expand primary with IDENTIFIER for vars to be useful
+primary -> IDENTIFIER | NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
+

@@ -12,6 +12,10 @@ func (a AstPrinter) Print(expr Expr) any {
 	return expr.Accept(a).(string)
 }
 
+func (a AstPrinter) VisitVariableExpr(expr Variable) any {
+	return a.parenthesize("variable", expr)
+}
+
 func (a AstPrinter) VisitCommaExpr(expr Comma) any {
 	return a.parenthesize("comma", expr.exprs...)
 }

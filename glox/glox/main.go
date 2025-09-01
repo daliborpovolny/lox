@@ -10,11 +10,21 @@ import (
 type Lox struct {
 	hadError        bool
 	hadRuntimeError bool
+
+	interpreter *Interpreter
+}
+
+func NewLox() *Lox {
+	return &Lox{
+		hadError:        false,
+		hadRuntimeError: false,
+		interpreter:     NewInterpreter(),
+	}
 }
 
 var printParseTree bool = false
 
-var lox Lox = Lox{}
+var lox *Lox = NewLox()
 
 func (l *Lox) Start(args []string) error {
 	if len(args) > 1 {
@@ -73,8 +83,7 @@ func (l *Lox) run(source string) {
 	// 	fmt.Println(astPrinter.Print(statements))
 	// }
 
-	intepreter := Interpreter{}
-	intepreter.Interpret(statements)
+	l.interpreter.Interpret(statements)
 	// fmt.Println("succesfully interpreted")
 
 }

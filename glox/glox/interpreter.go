@@ -8,14 +8,16 @@ import (
 
 type RuntimeError struct {
 	Message string
-	Token   Token // optional, if you want context
+	Token   Token
 }
 
 func (e *RuntimeError) Error() string {
 	return fmt.Sprintf("Runtime error at '%v': %s", e.Token.lexeme, e.Message)
 }
 
-type Interpreter struct{}
+type Interpreter struct {
+	environment *Environment
+}
 
 func (i *Interpreter) Interpret(statements []Stmt) {
 	defer func() {
@@ -33,8 +35,26 @@ func (i *Interpreter) Interpret(statements []Stmt) {
 	}
 }
 
+func NewInterpreter() *Interpreter {
+	return &Interpreter{
+		environment: NewEnvironment(),
+	}
+}
+
 func (i *Interpreter) execute(stmt Stmt) {
 	stmt.Accept(i)
+}
+
+func (i *Interpreter) VisitVarStmt(stmt Var) any {
+	fmt.Println("visiting var statement")
+	var value Object
+
+	if stmt.initializer != nil {
+		value = i.evaluate(stmt.initializer)
+	}
+
+	i.environment.define(stmt.name.lexeme, value)
+	return nil
 }
 
 func (i *Interpreter) VisitExpressionStmt(stmt Expression) any {
@@ -46,6 +66,11 @@ func (i *Interpreter) VisitPrintStmt(stmt Print) any {
 	value := i.evaluate(stmt.expression)
 	fmt.Println(value)
 	return nil
+}
+
+func (i *Interpreter) VisitVariableExpr(expr Variable) any {
+	fmt.Println("visiting variable expr")
+	return i.environment.get(expr.name)
 }
 
 func (i *Interpreter) VisitLiteralExpr(expr Literal) any {

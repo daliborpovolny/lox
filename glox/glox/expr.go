@@ -7,6 +7,7 @@ type exprVisitor interface {
 	VisitUnaryExpr(expr Unary) any
 	VisitTernaryExpr(expr Ternary) any
 	VisitCommaExpr(expr Comma) any
+	VisitVariableExpr(expr Variable) any
 }
 
 type Expr interface {
@@ -63,4 +64,12 @@ type Comma struct {
 
 func (c Comma) Accept(visitor exprVisitor) any {
 	return visitor.VisitCommaExpr(c)
+}
+
+type Variable struct {
+	name Token
+}
+
+func (v Variable) Accept(visitor exprVisitor) any {
+	return visitor.VisitVariableExpr(v)
 }
