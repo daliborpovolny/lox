@@ -53,7 +53,7 @@ func (i *Interpreter) VisitLiteralExpr(expr Literal) any {
 }
 
 func (i *Interpreter) VisitGroupingExpr(expr Grouping) any {
-	return i.evaluate(expr)
+	return i.evaluate(expr.expression)
 }
 
 func (i *Interpreter) evaluate(expr Expr) any {
