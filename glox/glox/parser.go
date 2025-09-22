@@ -29,10 +29,6 @@ func (p *Parser) Parse() []Stmt {
 		statements = append(statements, p.declaration())
 	}
 
-	fmt.Println(len(statements))
-
-	fmt.Println("returning from Parse")
-
 	return statements
 }
 
@@ -40,7 +36,7 @@ func (p *Parser) declaration() Stmt {
 	defer func() {
 		if r := recover(); r != nil {
 			if _, ok := r.(*ParseError); ok {
-				fmt.Println("synchronizing...")
+				// fmt.Println("synchronizing...")
 				p.synchronize()
 			} else {
 				panic(r)
@@ -49,11 +45,9 @@ func (p *Parser) declaration() Stmt {
 	}()
 
 	if p.match(VAR) {
-		fmt.Println("trying var")
 		return p.varDeclaration()
 	}
 
-	fmt.Println("trying statement")
 	return p.statement()
 }
 
@@ -66,7 +60,6 @@ func (p *Parser) varDeclaration() Stmt {
 	}
 
 	p.consume(SEMICOLON, "Expect ';' after variable declaration.")
-	fmt.Println("found semicolon")
 
 	return Var{
 		name,
@@ -94,6 +87,26 @@ func (p *Parser) expressionStatement() Stmt {
 }
 
 func (p *Parser) expression() Expr {
+	return p.assignment()
+}
+
+func (p *Parser) assignment() Expr {
+	expr := p.comma()
+	if p.match(EQUAL) {
+		equals := p.previous()
+		value := p.assignment()
+
+		if v, ok := expr.(Variable); ok {
+			name := v.name
+			return Assign{name, value}
+		}
+		p.error(equals, "Invalid assignment target")
+	}
+
+	return expr
+}
+
+func (p *Parser) comma() Expr {
 	expr := p.nonCommaExpression()
 	if p.peek().tokenType == COMMA {
 		commaExpr := Comma{

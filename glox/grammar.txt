@@ -90,3 +90,41 @@ printStmt -> "print" expression ";" ;
 // we must expand primary with IDENTIFIER for vars to be useful
 primary -> IDENTIFIER | NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
 
+
+-- Assignment 8.4 - Complete grammar
+
+
+program -> declaration* EOF ;
+
+declaration -> varDecl | statement ;
+
+varDecl -> "var" IDENTIFIER ( "=" expression )? ";" ;
+
+statement -> exprtStmt | printStmt ;
+
+exprStmt -> expression ";" ;
+
+printStmt -> "print" expression ";" ;
+
+
+expression -> assignment;
+
+assignment -> IDENTIFIER "=" assignment | comma ;
+
+comma -> non_comma_expression ( "," non_comma_expression )* ;
+
+non_comma_expression -> ternary ;
+
+ternary -> equality "?" equality ":" ternary | equality ;
+
+equality -> comparision ( ( "!=" | "==" ) comparision )* ;
+
+comparision -> term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+
+term -> factor ( ( "-" | "+" ) factor )* ;
+
+factor -> unary ( ( "\" | "*" ) unary )* ;
+
+unary -> ( "!" | "-" ) unary | primary ;
+
+primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;

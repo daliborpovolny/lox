@@ -1,6 +1,7 @@
 package main
 
 type exprVisitor interface {
+	VisitAssignExpr(expr Assign) any
 	VisitBinaryExpr(expr Binary) any
 	VisitGroupingExpr(expr Grouping) any
 	VisitLiteralExpr(expr Literal) any
@@ -13,6 +14,15 @@ type exprVisitor interface {
 type Expr interface {
 	Accept(visitor exprVisitor) any
 }
+type Assign struct {
+	name  Token
+	value Expr
+}
+
+func (a Assign) Accept(visitor exprVisitor) any {
+	return visitor.VisitAssignExpr(a)
+}
+
 type Binary struct {
 	left     Expr
 	operator Token

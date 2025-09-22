@@ -22,7 +22,7 @@ func NewLox() *Lox {
 	}
 }
 
-var printParseTree bool = false
+var printParseTree bool = true
 
 var lox *Lox = NewLox()
 
@@ -78,10 +78,10 @@ func (l *Lox) run(source string) {
 	}
 	// fmt.Println("succesfully parsed")
 
-	// if printParseTree {
-	// 	astPrinter := AstPrinter{}
-	// 	fmt.Println(astPrinter.Print(statements))
-	// }
+	if printParseTree {
+		astPrinter := AstPrinter{}
+		fmt.Println(astPrinter.Print(statements))
+	}
 
 	l.interpreter.Interpret(statements)
 	// fmt.Println("succesfully interpreted")

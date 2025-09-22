@@ -46,7 +46,6 @@ func (i *Interpreter) execute(stmt Stmt) {
 }
 
 func (i *Interpreter) VisitVarStmt(stmt Var) any {
-	fmt.Println("visiting var statement")
 	var value Object
 
 	if stmt.initializer != nil {
@@ -69,7 +68,6 @@ func (i *Interpreter) VisitPrintStmt(stmt Print) any {
 }
 
 func (i *Interpreter) VisitVariableExpr(expr Variable) any {
-	fmt.Println("visiting variable expr")
 	return i.environment.get(expr.name)
 }
 
@@ -83,6 +81,12 @@ func (i *Interpreter) VisitGroupingExpr(expr Grouping) any {
 
 func (i *Interpreter) evaluate(expr Expr) any {
 	return expr.Accept(i)
+}
+
+func (i *Interpreter) VisitAssignExpr(expr Assign) any {
+	value := i.evaluate(expr.value)
+	i.environment.assign(expr.name, value)
+	return value
 }
 
 func (i *Interpreter) VisitUnaryExpr(expr Unary) any {

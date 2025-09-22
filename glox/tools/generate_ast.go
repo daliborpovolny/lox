@@ -16,6 +16,7 @@ func main() {
 	outputDir := os.Args[1]
 
 	err := defineAst(outputDir, "Expr", []string{
+		"Assign		: Token name, Expr value",
 		"Binary		: Expr left, Token operator, Expr right",
 		"Grouping	: Expr expression",
 		"Literal	: Object value",

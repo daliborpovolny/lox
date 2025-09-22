@@ -5,15 +5,35 @@ import (
 	"strings"
 )
 
-type AstPrinter struct {
+type AstPrinter struct{}
+
+func (a AstPrinter) Print(statements []Stmt) string {
+	var builder strings.Builder
+	for _, stmt := range statements {
+		builder.WriteString(stmt.Accept(a).(string))
+		builder.WriteString("\n")
+	}
+	return builder.String()
 }
 
-func (a AstPrinter) Print(expr Expr) any {
-	return expr.Accept(a).(string)
+func (a AstPrinter) VisitExpressionStmt(stmt Expression) any {
+	return a.parenthesize("expression", stmt.expression)
+}
+
+func (a AstPrinter) VisitPrintStmt(stmt Print) any {
+	return a.parenthesize("print", stmt.expression)
+}
+
+func (a AstPrinter) VisitVarStmt(stmt Var) any {
+	return a.parenthesize("var "+stmt.name.lexeme, stmt.initializer)
 }
 
 func (a AstPrinter) VisitVariableExpr(expr Variable) any {
-	return a.parenthesize("variable", expr)
+	return expr.name.lexeme
+}
+
+func (a AstPrinter) VisitAssignExpr(expr Assign) any {
+	return a.parenthesize("assign "+expr.name.lexeme, expr.value)
 }
 
 func (a AstPrinter) VisitCommaExpr(expr Comma) any {
@@ -44,15 +64,15 @@ func (a AstPrinter) VisitUnaryExpr(expr Unary) any {
 }
 
 func (a AstPrinter) parenthesize(name string, exprs ...Expr) string {
-	s := strings.Builder{}
+	var s strings.Builder
 	s.WriteString("(")
 	s.WriteString(name)
-
 	for _, expr := range exprs {
-		s.WriteString(" ")
-		s.WriteString(expr.Accept(a).(string))
+		if expr != nil {
+			s.WriteString(" ")
+			s.WriteString(expr.Accept(a).(string))
+		}
 	}
-
 	s.WriteString(")")
 	return s.String()
 }
