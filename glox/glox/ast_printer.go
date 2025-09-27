@@ -16,6 +16,16 @@ func (a AstPrinter) Print(statements []Stmt) string {
 	return builder.String()
 }
 
+func (a AstPrinter) VisitBlockStmt(stmt Block) any {
+	var output strings.Builder
+
+	output.WriteString("block\n")
+	output.WriteString(a.Print(stmt.statements))
+	output.WriteString("endblock\n")
+
+	return output.String()
+}
+
 func (a AstPrinter) VisitExpressionStmt(stmt Expression) any {
 	return a.parenthesize("expression", stmt.expression)
 }

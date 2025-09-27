@@ -128,3 +128,45 @@ factor -> unary ( ( "\" | "*" ) unary )* ;
 unary -> ( "!" | "-" ) unary | primary ;
 
 primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
+
+
+
+#
+-- 8 End - Scope - Complete grammar
+#
+
+program -> declaration* EOF ;
+
+declaration -> varDecl | statement ;
+
+varDecl -> "var" IDENTIFIER ( "=" expression )? ";" ;
+
+statement -> exprStmt | printStmt | block;
+
+exprStmt -> expression ";" ;
+
+printStmt -> "print" expression ";" ;
+
+block -> "{" declaration* "}"
+
+expression -> assignment;
+
+assignment -> IDENTIFIER "=" assignment | comma ;
+
+comma -> non_comma_expression ( "," non_comma_expression )* ;
+
+non_comma_expression -> ternary ;
+
+ternary -> equality "?" equality ":" ternary | equality ;
+
+equality -> comparision ( ( "!=" | "==" ) comparision )* ;
+
+comparision -> term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+
+term -> factor ( ( "-" | "+" ) factor )* ;
+
+factor -> unary ( ( "/" | "*" ) unary )* ;
+
+unary -> ( "!" | "-" ) unary | primary ;
+
+primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;

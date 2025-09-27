@@ -37,12 +37,30 @@ func (i *Interpreter) Interpret(statements []Stmt) {
 
 func NewInterpreter() *Interpreter {
 	return &Interpreter{
-		environment: NewEnvironment(),
+		environment: NewEnvironment(nil),
 	}
 }
 
 func (i *Interpreter) execute(stmt Stmt) {
 	stmt.Accept(i)
+}
+
+func (i *Interpreter) VisitBlockStmt(stmt Block) any {
+	i.executeBlock(stmt.statements, NewEnvironment(i.environment))
+	return nil
+}
+
+func (i *Interpreter) executeBlock(stmts []Stmt, env *Environment) {
+
+	oldEnv := i.environment
+
+	i.environment = env
+
+	for _, stmt := range stmts {
+		i.execute(stmt)
+	}
+
+	i.environment = oldEnv
 }
 
 func (i *Interpreter) VisitVarStmt(stmt Var) any {

@@ -22,7 +22,7 @@ func NewLox() *Lox {
 	}
 }
 
-var printParseTree bool = true
+var printParseTree bool = false
 
 var lox *Lox = NewLox()
 

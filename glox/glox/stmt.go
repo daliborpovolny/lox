@@ -1,6 +1,7 @@
 package main
 
 type stmtVisitor interface {
+	VisitBlockStmt(stmt Block) any
 	VisitExpressionStmt(stmt Expression) any
 	VisitPrintStmt(stmt Print) any
 	VisitVarStmt(stmt Var) any
@@ -9,6 +10,14 @@ type stmtVisitor interface {
 type Stmt interface {
 	Accept(visitor stmtVisitor) any
 }
+type Block struct {
+	statements []Stmt
+}
+
+func (b Block) Accept(visitor stmtVisitor) any {
+	return visitor.VisitBlockStmt(b)
+}
+
 type Expression struct {
 	expression Expr
 }
