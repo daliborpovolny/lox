@@ -262,7 +262,7 @@ func (i *Interpreter) VisitBinaryExpr(expr Binary) any {
 }
 
 func (i *Interpreter) VisitCommaExpr(expr Comma) any {
-	fmt.Println("visiting comma")
+	// fmt.Println("visiting comma")
 
 	for index, e := range expr.exprs {
 		res := i.evaluate(e)
@@ -276,7 +276,7 @@ func (i *Interpreter) VisitCommaExpr(expr Comma) any {
 }
 
 func (i *Interpreter) VisitTernaryExpr(expr Ternary) any {
-	fmt.Println("visiting ternary")
+	// fmt.Println("visiting ternary")
 
 	condition := i.evaluate(expr.condition)
 	if i.isTruthy(condition) {

@@ -17,6 +17,7 @@ type Scanner struct {
 func NewScanner(source string) *Scanner {
 	s := Scanner{
 		source: source,
+		line:   1,
 	}
 
 	s.tokens = make([]Token, 0, 10)
@@ -96,8 +97,18 @@ func (s *Scanner) scanToken() {
 		}
 	case '/':
 		if s.match('/') {
-			for s.peek() != 0 && !s.isAtEnd() {
+			for {
+				c := s.peek()
+				if c == 0 {
+					break
+				}
 				s.advance()
+
+				if c == '\n' {
+					s.line++
+					break
+				}
+
 			}
 		} else if s.match('*') {
 			for {

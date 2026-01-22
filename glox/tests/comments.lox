@@ -1,0 +1,10 @@
+print 2 + 2; // this prints 4
+
+/*
+
+Hey Jude!
+Don't let me down
+
+*/
+
+print "done";

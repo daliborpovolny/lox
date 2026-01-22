@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/exec"
 	"strconv"
 )
 
@@ -28,8 +29,13 @@ var lox *Lox = NewLox()
 
 func (l *Lox) Start(args []string) error {
 	if len(args) > 1 {
-		return fmt.Errorf("usage: golox [script]")
+		return fmt.Errorf("usage: golox [script] | test")
 	} else if len(args) == 1 {
+		if args[0] == "test" {
+			l.runTests()
+			return nil
+		}
+
 		err := l.runFile(args[0])
 		if err != nil {
 			return err
@@ -108,6 +114,49 @@ func (l *Lox) errorToken(token Token, message string) {
 func (l *Lox) runTimeError(rErr RuntimeError) {
 	fmt.Fprintln(os.Stderr, rErr.Message+"\n[line "+strconv.Itoa(rErr.Token.line)+"]")
 	l.hadRuntimeError = false
+}
+
+// TESTFILES is a list of strings of test file names, for a test to work
+// it has a have a {name}.lox and {name}.out in the tests folder
+// the {name}.out file is what the output will be compared agains
+// the {name}.out file should end with a new line
+var TESTFILES []string = []string{
+	"hello",
+	"scope",
+	"math",
+	"precedance",
+	"comments",
+}
+
+// runs the test included in TESTFILES
+func (l *Lox) runTests() bool {
+
+	exec.Command("go", "build").Run()
+
+	for _, path := range TESTFILES {
+		cmd := exec.Command("./glox", "../tests/"+path+".lox")
+
+		outputBytes, err := cmd.Output()
+		if err != nil {
+			fmt.Println("error during test of", path, ":", err)
+			return false
+		}
+
+		desiredBytes, err := os.ReadFile("../tests/" + path + ".out")
+
+		output := string(outputBytes)
+		desired := string(desiredBytes)
+
+		if output != desired {
+			fmt.Println("test", path, "failed")
+			fmt.Println("\t expected:\n" + desired)
+			fmt.Println("\t actual:\n" + output)
+		} else {
+			fmt.Println("test", path, "passed")
+		}
+	}
+
+	return true
 }
 
 func main() {
