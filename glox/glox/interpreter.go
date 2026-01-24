@@ -110,6 +110,16 @@ func (i *Interpreter) VisitPrintStmt(stmt Print) any {
 	return nil
 }
 
+func (i *Interpreter) VisitIfStmt(stmt If) any {
+	if i.isTruthy(i.evaluate(stmt.condition)) {
+		i.execute(stmt.thenBranch)
+	} else if stmt.elseBranch != nil {
+		i.execute(stmt.elseBranch)
+	}
+
+	return nil
+}
+
 func (i *Interpreter) VisitVariableExpr(expr Variable) any {
 	return i.environment.get(expr.name)
 }
@@ -130,6 +140,25 @@ func (i *Interpreter) VisitAssignExpr(expr Assign) any {
 	value := i.evaluate(expr.value)
 	i.environment.assign(expr.name, value)
 	return value
+}
+
+func (i *Interpreter) VisitLogicalExpr(expr Logical) any {
+
+	left := i.evaluate(expr.left)
+
+	switch expr.operator.tokenType {
+	case OR:
+		if i.isTruthy(left) {
+			return left
+		}
+	case AND:
+		if !i.isTruthy(left) {
+			return left
+		}
+	}
+
+	return i.evaluate(expr.right)
+
 }
 
 func (i *Interpreter) VisitUnaryExpr(expr Unary) any {

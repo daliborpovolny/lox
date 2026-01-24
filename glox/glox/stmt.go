@@ -5,6 +5,7 @@ type stmtVisitor interface {
 	VisitExpressionStmt(stmt Expression) any
 	VisitPrintStmt(stmt Print) any
 	VisitVarStmt(stmt Var) any
+	VisitIfStmt(stmt If) any
 }
 
 type Stmt interface {
@@ -41,4 +42,14 @@ type Var struct {
 
 func (v Var) Accept(visitor stmtVisitor) any {
 	return visitor.VisitVarStmt(v)
+}
+
+type If struct {
+	condition  Expr
+	thenBranch Stmt
+	elseBranch Stmt
+}
+
+func (i If) Accept(visitor stmtVisitor) any {
+	return visitor.VisitIfStmt(i)
 }

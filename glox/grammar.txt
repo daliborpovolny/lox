@@ -170,3 +170,49 @@ factor -> unary ( ( "/" | "*" ) unary )* ;
 unary -> ( "!" | "-" ) unary | primary ;
 
 primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
+
+#
+-- 9 - adds branching and logic operators and fixes the precedance of comma
+#
+
+program -> declaration* EOF ;
+
+declaration -> varDecl | statement ;
+
+varDecl -> "var" IDENTIFIER ( "=" expression )? ";" ;
+
+statement -> exprStmt | printStmt | block | ifStmt;
+
+
+exprStmt -> expression ";" ;
+
+printStmt -> "print" expression ";" ;
+
+block -> "{" declaration* "}"
+
+ifStmt -> "if" "(" expression ")" statement ( "else" statement )? ; 
+
+expression -> comma;
+
+comma -> non_comma_expression ( "," non_comma_expression )* ;
+
+non_comma_expression -> assignment ;
+
+assignment -> IDENTIFIER "=" assignment | ternary ;
+
+ternary -> logic_or "?" expression ":" ternary | logic_or ;
+
+logic_or -> logic_and ( "or" logic_and )* ;
+logic_and -> equality ( "and" equality )* ;
+
+equality -> comparision ( ( "!=" | "==" ) comparision )* ;
+
+comparision -> term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+
+term -> factor ( ( "-" | "+" ) factor )* ;
+
+factor -> unary ( ( "/" | "*" ) unary )* ;
+
+unary -> ( "!" | "-" ) unary | primary ;
+
+primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;

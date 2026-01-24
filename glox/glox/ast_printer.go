@@ -38,6 +38,18 @@ func (a AstPrinter) VisitVarStmt(stmt Var) any {
 	return a.parenthesize("var "+stmt.name.lexeme, stmt.initializer)
 }
 
+func (a AstPrinter) VisitIfStmt(stmt If) any {
+	var output strings.Builder
+
+	output.WriteString("if " + stmt.condition.Accept(a).(string))
+	output.WriteString(" then" + stmt.thenBranch.Accept(a).(string))
+	if stmt.elseBranch != nil {
+	}
+	output.WriteString(" else" + stmt.elseBranch.Accept(a).(string))
+
+	return output.String()
+}
+
 func (a AstPrinter) VisitVariableExpr(expr Variable) any {
 	return expr.name.lexeme
 }
@@ -52,6 +64,10 @@ func (a AstPrinter) VisitCommaExpr(expr Comma) any {
 
 func (a AstPrinter) VisitTernaryExpr(expr Ternary) any {
 	return a.parenthesize("ternary", expr.condition, expr.outcome1, expr.outcome2)
+}
+
+func (a AstPrinter) VisitLogicalExpr(expr Logical) any {
+	return a.parenthesize("logical "+expr.operator.lexeme, expr.left, expr.right)
 }
 
 func (a AstPrinter) VisitBinaryExpr(expr Binary) any {

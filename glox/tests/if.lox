@@ -1,0 +1,12 @@
+if (3 > 2) 
+    print "yes!";
+else
+    print "yay uwu";
+
+if (3 < 2) 
+    print "no!";
+
+if (2 > 2) 
+    print "NO!";
+else
+    print "yay uwu";

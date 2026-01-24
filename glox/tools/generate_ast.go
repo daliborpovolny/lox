@@ -20,6 +20,7 @@ func main() {
 		"Binary		: Expr left, Token operator, Expr right",
 		"Grouping	: Expr expression",
 		"Literal	: Object value",
+		"Logical	: Expr left, Token operator, Expr right",
 		"Unary 		: Token operator, Expr right",
 		"Ternary	: Expr condition, Expr outcome1, Expr outcome2",
 		"Comma		: []Expr exprs",
@@ -35,6 +36,7 @@ func main() {
 		"Expression	: Expr expression",
 		"Print		: Expr expression",
 		"Var		: Token name, Expr initializer",
+		"If			: Expr condition, Stmt thenBranch, Stmt elseBranch",
 	})
 	if err != nil {
 		fmt.Println(err)

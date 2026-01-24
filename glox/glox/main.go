@@ -79,9 +79,12 @@ func (l *Lox) runPrompt() {
 
 		parser := NewParser(tokens)
 		statements := parser.Parse()
+		if l.hadError {
+			l.hadError = false
+			continue
+		}
 
 		i.ReplInterpret(statements)
-		l.hadError = false
 	}
 }
 
@@ -144,6 +147,8 @@ var TESTFILES []string = []string{
 	"comments",
 	"comma",
 	"compare",
+	"if",
+	"logicalops",
 }
 
 // runs the test included in TESTFILES

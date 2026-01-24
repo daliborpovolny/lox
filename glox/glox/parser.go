@@ -74,6 +74,9 @@ func (p *Parser) statement() Stmt {
 	if p.match(LEFT_BRACE) {
 		return Block{p.block()}
 	}
+	if p.match(IF) {
+		return p.ifStatement()
+	}
 	return p.expressionStatement()
 }
 
@@ -100,24 +103,28 @@ func (p *Parser) expressionStatement() Stmt {
 	return Expression{expr}
 }
 
-func (p *Parser) expression() Expr {
-	return p.assignment()
-}
+func (p *Parser) ifStatement() Stmt {
 
-func (p *Parser) assignment() Expr {
-	expr := p.comma()
-	if p.match(EQUAL) {
-		equals := p.previous()
-		value := p.assignment()
+	p.consume(LEFT_PAREN, "Expect '(' after if")
+	condition := p.expression()
+	p.consume(RIGHT_PAREN, "Expect ')' after if")
 
-		if v, ok := expr.(Variable); ok {
-			name := v.name
-			return Assign{name, value}
-		}
-		p.error(equals, "Invalid assignment target")
+	thenStmt := p.statement()
+
+	var elseStmt Stmt
+	if p.match(ELSE) {
+		elseStmt = p.statement()
 	}
 
-	return expr
+	return If{
+		condition,
+		thenStmt,
+		elseStmt,
+	}
+}
+
+func (p *Parser) expression() Expr {
+	return p.comma()
 }
 
 func (p *Parser) comma() Expr {
@@ -135,14 +142,30 @@ func (p *Parser) comma() Expr {
 }
 
 func (p *Parser) nonCommaExpression() Expr {
-	return p.ternary()
+	return p.assignment()
+}
+
+func (p *Parser) assignment() Expr {
+	expr := p.ternary()
+	if p.match(EQUAL) {
+		equals := p.previous()
+		value := p.assignment()
+
+		if v, ok := expr.(Variable); ok {
+			name := v.name
+			return Assign{name, value}
+		}
+		p.error(equals, "Invalid assignment target")
+	}
+
+	return expr
 }
 
 func (p *Parser) ternary() Expr {
-	expr := p.equality()
+	expr := p.logicOr()
 
 	if p.match(QUESTION_MARK) {
-		outcome1 := p.equality()
+		outcome1 := p.expression()
 		p.consume(COLON, "? denotes a ternary operator: expected expr ? expr : expr")
 		outcome2 := p.ternary()
 		return Ternary{
@@ -151,6 +174,32 @@ func (p *Parser) ternary() Expr {
 			outcome2:  outcome2,
 		}
 	}
+	return expr
+}
+
+func (p *Parser) logicOr() Expr {
+	expr := p.logicAnd()
+
+	for p.match(OR) {
+		operator := p.previous()
+		right := p.logicAnd()
+
+		expr = Logical{expr, operator, right}
+	}
+
+	return expr
+}
+
+func (p *Parser) logicAnd() Expr {
+	expr := p.equality()
+
+	for p.match(AND) {
+		operator := p.previous()
+		right := p.equality()
+
+		expr = Logical{expr, operator, right}
+	}
+
 	return expr
 }
 
