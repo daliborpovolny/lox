@@ -3,14 +3,20 @@ package main
 type Environment struct {
 	enclosing *Environment
 
-	values map[string]Object
+	values      map[string]Object
+	initialized map[string]bool
 }
 
 func NewEnvironment(enclosing *Environment) *Environment {
 	return &Environment{
-		enclosing: enclosing,
-		values:    make(map[string]Object, 10),
+		enclosing:   enclosing,
+		values:      make(map[string]Object, 10),
+		initialized: make(map[string]bool, 10),
 	}
+}
+
+func (e *Environment) initialize(name string) {
+	e.initialized[name] = true
 }
 
 func (e *Environment) define(name string, value Object) {
@@ -30,6 +36,15 @@ func (e *Environment) get(name Token) Object {
 		}
 		panic(err)
 	}
+
+	if !e.initialized[name.lexeme] {
+		var err error = &RuntimeError{
+			"Uninitialized variable '" + name.lexeme + "'.",
+			name,
+		}
+		panic(err)
+	}
+
 	return value
 }
 
@@ -50,4 +65,5 @@ func (e *Environment) assign(name Token, value Object) {
 	}
 
 	e.values[name.lexeme] = value
+	e.initialized[name.lexeme] = true
 }

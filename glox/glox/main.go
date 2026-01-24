@@ -9,6 +9,7 @@ import (
 )
 
 type Lox struct {
+	repl            bool
 	hadError        bool
 	hadRuntimeError bool
 
@@ -65,10 +66,21 @@ func (l *Lox) runFile(path string) error {
 }
 
 func (l *Lox) runPrompt() {
-	scanner := bufio.NewScanner(os.Stdin)
-	for scanner.Scan() {
-		input := scanner.Text()
-		l.run(input)
+	l.repl = true
+	inputScanner := bufio.NewScanner(os.Stdin)
+
+	i := NewInterpreter()
+
+	for inputScanner.Scan() {
+		input := inputScanner.Text()
+
+		scanner := NewScanner(input)
+		tokens := scanner.scanTokens()
+
+		parser := NewParser(tokens)
+		statements := parser.Parse()
+
+		i.ReplInterpret(statements)
 		l.hadError = false
 	}
 }
@@ -112,7 +124,11 @@ func (l *Lox) errorToken(token Token, message string) {
 }
 
 func (l *Lox) runTimeError(rErr RuntimeError) {
-	fmt.Fprintln(os.Stderr, rErr.Message+"\n[line "+strconv.Itoa(rErr.Token.line)+"]")
+	msg := rErr.Message
+	if !l.repl {
+		msg += "\n[line " + strconv.Itoa(rErr.Token.line) + "]"
+	}
+	fmt.Fprintln(os.Stderr, msg)
 	l.hadRuntimeError = false
 }
 

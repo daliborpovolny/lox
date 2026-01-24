@@ -35,6 +35,30 @@ func (i *Interpreter) Interpret(statements []Stmt) {
 	}
 }
 
+// prints out the value of expression statements after executing them
+func (i *Interpreter) ReplInterpret(statements []Stmt) {
+	defer func() {
+		if r := recover(); r != nil {
+			if runTimeErr, ok := r.(*RuntimeError); ok {
+				lox.runTimeError(*runTimeErr)
+			} else {
+				panic(r)
+			}
+		}
+	}()
+
+	for _, stmt := range statements {
+		exprStmt, ok := stmt.(Expression)
+		if ok {
+			value := i.evaluate(exprStmt.expression)
+			fmt.Println(value)
+		} else {
+			i.execute(stmt)
+		}
+
+	}
+}
+
 func NewInterpreter() *Interpreter {
 	return &Interpreter{
 		environment: NewEnvironment(nil),
@@ -68,6 +92,7 @@ func (i *Interpreter) VisitVarStmt(stmt Var) any {
 
 	if stmt.initializer != nil {
 		value = i.evaluate(stmt.initializer)
+		i.environment.initialize(stmt.name.lexeme)
 	}
 
 	i.environment.define(stmt.name.lexeme, value)
