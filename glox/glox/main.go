@@ -126,6 +126,8 @@ var TESTFILES []string = []string{
 	"math",
 	"precedance",
 	"comments",
+	"comma",
+	"compare",
 }
 
 // runs the test included in TESTFILES
@@ -138,7 +140,7 @@ func (l *Lox) runTests() bool {
 
 		outputBytes, err := cmd.Output()
 		if err != nil {
-			fmt.Println("error during test of", path, ":", err)
+			fmt.Println("error during test of "+path+":\n\t", string(outputBytes))
 			return false
 		}
 
