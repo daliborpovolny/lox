@@ -120,6 +120,14 @@ func (i *Interpreter) VisitIfStmt(stmt If) any {
 	return nil
 }
 
+func (i *Interpreter) VisitWhileStmt(stmt While) any {
+	for i.isTruthy(i.evaluate(stmt.condition)) {
+		i.execute(stmt.body)
+	}
+
+	return nil
+}
+
 func (i *Interpreter) VisitVariableExpr(expr Variable) any {
 	return i.environment.get(expr.name)
 }

@@ -6,6 +6,7 @@ type stmtVisitor interface {
 	VisitPrintStmt(stmt Print) any
 	VisitVarStmt(stmt Var) any
 	VisitIfStmt(stmt If) any
+	VisitWhileStmt(stmt While) any
 }
 
 type Stmt interface {
@@ -52,4 +53,13 @@ type If struct {
 
 func (i If) Accept(visitor stmtVisitor) any {
 	return visitor.VisitIfStmt(i)
+}
+
+type While struct {
+	condition Expr
+	body      Stmt
+}
+
+func (w While) Accept(visitor stmtVisitor) any {
+	return visitor.VisitWhileStmt(w)
 }

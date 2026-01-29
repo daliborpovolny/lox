@@ -149,6 +149,7 @@ var TESTFILES []string = []string{
 	"compare",
 	"if",
 	"logicalops",
+	"while",
 }
 
 // runs the test included in TESTFILES

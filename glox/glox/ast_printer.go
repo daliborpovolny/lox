@@ -50,6 +50,15 @@ func (a AstPrinter) VisitIfStmt(stmt If) any {
 	return output.String()
 }
 
+func (a AstPrinter) VisitWhileStmt(stmt While) any {
+	var output strings.Builder
+
+	output.WriteString("while " + stmt.condition.Accept(a).(string))
+	output.WriteString("then" + stmt.body.Accept(a).(string))
+
+	return output.String()
+}
+
 func (a AstPrinter) VisitVariableExpr(expr Variable) any {
 	return expr.name.lexeme
 }
