@@ -84,7 +84,60 @@ func (p *Parser) statement() Stmt {
 	if p.match(WHILE) {
 		return p.whileStatement()
 	}
+	if p.match(FOR) {
+		return p.forStatement()
+	}
+
+	if p.match(RETURN) {
+		return p.returnStatement()
+	}
+
 	return p.expressionStatement()
+}
+
+func (p *Parser) forStatement() Stmt {
+	p.consume(LEFT_PAREN, "Expect '(' after 'for'.")
+
+	var initializer Stmt
+	if p.match(SEMICOLON) {
+
+	} else if p.match(VAR) {
+		initializer = p.varDeclaration()
+	} else {
+		initializer = p.expressionStatement()
+	}
+
+	var condition Expr
+	if !p.check(SEMICOLON) {
+		condition = p.expression()
+	}
+	p.consume(SEMICOLON, "Expect ';' after loop condition.")
+
+	var increment Expr
+	if !p.check(RIGHT_PAREN) {
+		increment = p.expression()
+	}
+
+	p.consume(RIGHT_PAREN, "Expect ')' after for clauses.")
+
+	body := p.statement()
+
+	if increment != nil {
+		body = Block{
+			[]Stmt{body, Expression{increment}},
+		}
+	}
+
+	if condition == nil {
+		condition = Literal{true}
+	}
+	body = While{condition, body}
+
+	if initializer != nil {
+		body = Block{[]Stmt{initializer, body}}
+	}
+
+	return body
 }
 
 func (p *Parser) block() []Stmt {
@@ -102,6 +155,18 @@ func (p *Parser) printStatement() Stmt {
 	value := p.expression()
 	p.consume(SEMICOLON, "Expect ';' after value")
 	return Print{value}
+}
+
+func (p *Parser) returnStatement() Stmt {
+	keyword := p.previous()
+	var value Expr
+
+	if !p.check(SEMICOLON) {
+		value = p.expression()
+	}
+
+	p.consume(SEMICOLON, "Expect ';' after return value.")
+	return Return{keyword, value}
 }
 
 func (p *Parser) expressionStatement() Stmt {

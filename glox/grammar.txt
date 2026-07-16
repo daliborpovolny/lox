@@ -236,8 +236,11 @@ function -> IDENTIFIER "(" parameters? ")" block ;
 
 parameters -> IDENTIFIER ( "," IDENTIFIER )* ;
 
-statement -> exprStmt | printStmt | block | ifStmt | whileStmt ;
+statement -> exprStmt | forStmt | printStmt | block | ifStmt | whileStmt | returnStmt ;
 
+forStmt -> "for" "(" ( varDecl | exprStmt | ";" ) expression? ";" expression? ")" statement ;
+
+returnStmt -> "return" expression? ";" ;
 
 exprStmt -> expression ";" ;
 

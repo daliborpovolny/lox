@@ -4,7 +4,17 @@ type LoxFunction struct {
 	declaration *Function
 }
 
-func (f LoxFunction) call(interpreter Interpreter, arguments []any) any {
+func (f LoxFunction) call(interpreter Interpreter, arguments []any) (result any) {
+	defer func() {
+		if r := recover(); r != nil {
+			if returnErr, ok := r.(*ReturnError); ok {
+				result = returnErr.Value
+			} else {
+				panic(r)
+			}
+		}
+	}()
+
 	env := NewEnvironment(interpreter.globals)
 	for i := range len(f.declaration.params) {
 		env.initialize(f.declaration.params[i].lexeme)
@@ -12,6 +22,7 @@ func (f LoxFunction) call(interpreter Interpreter, arguments []any) any {
 	}
 
 	interpreter.executeBlock(f.declaration.body, env)
+
 	return nil
 }
 

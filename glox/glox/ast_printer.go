@@ -34,6 +34,10 @@ func (a AstPrinter) VisitPrintStmt(stmt Print) any {
 	return a.parenthesize("print", stmt.expression)
 }
 
+func (a AstPrinter) VisitReturnStmt(stmt Return) any {
+	return a.parenthesize("return", stmt.value)
+}
+
 func (a AstPrinter) VisitVarStmt(stmt Var) any {
 	return a.parenthesize("var "+stmt.name.lexeme, stmt.initializer)
 }

@@ -124,6 +124,19 @@ func (i *Interpreter) VisitPrintStmt(stmt Print) any {
 	return nil
 }
 
+func (i *Interpreter) VisitReturnStmt(stmt Return) any {
+
+	var emptyExpr Expr
+	var value any
+
+	if stmt.value != emptyExpr {
+		value = i.evaluate(stmt.value)
+	}
+
+	var returnError = ReturnError{value}
+	panic(&returnError)
+}
+
 func (i *Interpreter) VisitIfStmt(stmt If) any {
 	if i.isTruthy(i.evaluate(stmt.condition)) {
 		i.execute(stmt.thenBranch)

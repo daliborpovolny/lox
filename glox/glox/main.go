@@ -151,6 +151,8 @@ var TESTFILES []string = []string{
 	"logicalops",
 	"while",
 	"function",
+	"return",
+	"fib",
 }
 
 // runs the test included in TESTFILES

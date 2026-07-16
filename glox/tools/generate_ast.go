@@ -37,6 +37,7 @@ func main() {
 		"Expression	: Expr expression",
 		"Function	: Token name, []Token params, []Stmt body",
 		"Print		: Expr expression",
+		"Return		: Token keyword, Expr value",
 		"Var		: Token name, Expr initializer",
 		"If			: Expr condition, Stmt thenBranch, Stmt elseBranch",
 		"While      : Expr condition, Stmt body",
