@@ -17,6 +17,7 @@ func (e *RuntimeError) Error() string {
 
 type Interpreter struct {
 	environment *Environment
+	globals     *Environment
 }
 
 func (i *Interpreter) Interpret(statements []Stmt) {
@@ -60,8 +61,14 @@ func (i *Interpreter) ReplInterpret(statements []Stmt) {
 }
 
 func NewInterpreter() *Interpreter {
+	globals := NewEnvironment(nil)
+
+	globals.initialize("clock")
+	globals.define("clock", Clock{})
+
 	return &Interpreter{
-		environment: NewEnvironment(nil),
+		environment: globals,
+		globals:     globals,
 	}
 }
 
@@ -101,6 +108,13 @@ func (i *Interpreter) VisitVarStmt(stmt Var) any {
 
 func (i *Interpreter) VisitExpressionStmt(stmt Expression) any {
 	i.evaluate(stmt.expression)
+	return nil
+}
+
+func (i *Interpreter) VisitFunctionStmt(stmt Function) any {
+	function := LoxFunction{&stmt}
+	i.environment.initialize(stmt.name.lexeme)
+	i.environment.define(stmt.name.lexeme, function)
 	return nil
 }
 
@@ -321,6 +335,35 @@ func (i *Interpreter) VisitBinaryExpr(expr Binary) any {
 		}
 		panic(err)
 	}
+}
+
+func (i *Interpreter) VisitCallExpr(expr Call) any {
+	callee := i.evaluate(expr.callee)
+
+	arguments := make([]any, 0, 5)
+	for _, argument := range expr.arguments {
+		arguments = append(arguments, i.evaluate(argument))
+	}
+
+	function, ok := callee.(LoxCallable)
+	if !ok {
+		fmt.Println("not ok!")
+		var err RuntimeError = RuntimeError{
+			"Can only call functions and classes.",
+			expr.paren,
+		}
+		panic(&err)
+	}
+
+	if len(arguments) != function.arity() {
+		var err RuntimeError = RuntimeError{
+			"Expected " + strconv.Itoa(function.arity()) + " argument but got " + strconv.Itoa(len(arguments)) + ".",
+			expr.paren,
+		}
+		panic(&err)
+	}
+
+	return function.call(*i, arguments)
 }
 
 func (i *Interpreter) VisitCommaExpr(expr Comma) any {

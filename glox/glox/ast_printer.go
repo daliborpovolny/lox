@@ -38,6 +38,10 @@ func (a AstPrinter) VisitVarStmt(stmt Var) any {
 	return a.parenthesize("var "+stmt.name.lexeme, stmt.initializer)
 }
 
+func (a AstPrinter) VisitFunctionStmt(stmt Function) any {
+	return a.parenthesize("fun")
+}
+
 func (a AstPrinter) VisitIfStmt(stmt If) any {
 	var output strings.Builder
 
@@ -81,6 +85,10 @@ func (a AstPrinter) VisitLogicalExpr(expr Logical) any {
 
 func (a AstPrinter) VisitBinaryExpr(expr Binary) any {
 	return a.parenthesize(expr.operator.lexeme, expr.left, expr.right)
+}
+
+func (a AstPrinter) VisitCallExpr(expr Call) any {
+	return a.parenthesize("call", expr.arguments...)
 }
 
 func (a AstPrinter) VisitGroupingExpr(expr Grouping) any {

@@ -1,0 +1,29 @@
+
+var t1 = clock();
+//print(t1);
+
+
+fun hello() {
+    print("hello!");
+}
+
+hello();
+
+var t2 = clock();
+//print(t2);
+
+if (t1 <= t2) {
+    print("correct!");
+} else {
+    print("wrong!");
+}
+
+var a = 3;
+
+fun greetings(person1, person2) {
+    print(person1 + " says hello to " + person2 + "!");
+    var a = 4;
+}
+
+greetings("david", "misa");
+print(a);

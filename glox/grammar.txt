@@ -218,3 +218,64 @@ factor -> unary ( ( "/" | "*" ) unary )* ;
 unary -> ( "!" | "-" ) unary | primary ;
 
 primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
+
+
+#
+-- 10 - functions
+#
+
+program -> declaration* EOF ;
+
+declaration -> varDecl | funDecl | statement ;
+
+varDecl -> "var" IDENTIFIER ( "=" expression )? ";" ;
+
+funDecl -> "fun" function ;
+
+function -> IDENTIFIER "(" parameters? ")" block ;
+
+parameters -> IDENTIFIER ( "," IDENTIFIER )* ;
+
+statement -> exprStmt | printStmt | block | ifStmt | whileStmt ;
+
+
+exprStmt -> expression ";" ;
+
+printStmt -> "print" expression ";" ;
+
+block -> "{" declaration* "}"
+
+ifStmt -> "if" "(" expression ")" statement ( "else" statement )? ;
+
+whileStmt -> "while" "(" expression ")" statement ;
+
+expression -> comma;
+
+comma -> non_comma_expression ( "," non_comma_expression )* ;
+
+non_comma_expression -> assignment ;
+
+assignment -> IDENTIFIER "=" assignment | ternary ;
+
+ternary -> logic_or "?" expression ":" ternary | logic_or ;
+
+logic_or -> logic_and ( "or" logic_and )* ;
+logic_and -> equality ( "and" equality )* ;
+
+equality -> comparision ( ( "!=" | "==" ) comparision )* ;
+
+comparision -> term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+
+term -> factor ( ( "-" | "+" ) factor )* ;
+
+factor -> unary ( ( "/" | "*" ) unary )* ;
+
+unary -> ( "!" | "-" ) unary | call ;
+
+call -> primary ( "(" arguments? ")" )* ;
+
+arguments -> expression ( "," expression )* ;
+
+primary -> NUMBER | STRING | "true" | "false" | "nil" | "(" expression ")" ;
+
+

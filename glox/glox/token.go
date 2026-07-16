@@ -11,6 +11,10 @@ type Token struct {
 	line      int
 }
 
+func (t Token) String() string {
+	return fmt.Sprintf("%s %s %v", tokenTypeToString(t.tokenType), t.lexeme, t.object)
+}
+
 func (t Token) toString() string {
 	return fmt.Sprintf("%s %s %v", tokenTypeToString(t.tokenType), t.lexeme, t.object)
 }

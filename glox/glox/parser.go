@@ -48,6 +48,10 @@ func (p *Parser) declaration() Stmt {
 		return p.varDeclaration()
 	}
 
+	if p.match(FUN) {
+		return p.function("function")
+	}
+
 	return p.statement()
 }
 
@@ -104,6 +108,31 @@ func (p *Parser) expressionStatement() Stmt {
 	expr := p.expression()
 	p.consume(SEMICOLON, "Expect ';' after expression")
 	return Expression{expr}
+}
+
+func (p *Parser) function(kind string) Function {
+	name := p.consume(IDENTIFIER, "Expect "+kind+" name.")
+	p.consume(LEFT_PAREN, "Expect '(' after "+kind+"name.")
+	parameters := make([]Token, 0, 5)
+
+	if !p.check(RIGHT_PAREN) {
+		for {
+			if len(parameters) >= 255 {
+				p.error(p.peek(), "Cannot have more than 255 parameters.")
+			}
+			parameters = append(parameters, p.consume(IDENTIFIER, "Expect parameter name."))
+
+			if !p.match(COMMA) {
+				break
+			}
+		}
+	}
+
+	p.consume(RIGHT_PAREN, "Expect ')' after parameters.")
+	p.consume(LEFT_BRACE, "Expect '{' before "+kind+" body.")
+
+	body := p.block()
+	return Function{name, parameters, body}
 }
 
 func (p *Parser) ifStatement() Stmt {
@@ -263,7 +292,43 @@ func (p *Parser) unary() Expr {
 		right := p.unary()
 		return Unary{operator, right}
 	}
-	return p.primary()
+	return p.call()
+}
+
+func (p *Parser) call() Expr {
+	expr := p.primary()
+
+	for {
+		if p.match(LEFT_PAREN) {
+			expr = p.finishCall(expr)
+		} else {
+			break
+		}
+	}
+
+	return expr
+}
+
+func (p *Parser) finishCall(callee Expr) Expr {
+	arguments := make([]Expr, 0, 5)
+
+	if !p.check(RIGHT_PAREN) {
+		for {
+			if len(arguments) >= 255 {
+				p.error(p.peek(), "Cannot have more than 255 arguments")
+			}
+
+			arguments = append(arguments, p.nonCommaExpression())
+			if !p.match(COMMA) {
+				break
+			}
+		}
+	}
+
+	paren := p.consume(RIGHT_PAREN, "Expect ')' after arguments.")
+
+	return Call{callee, paren, arguments}
+
 }
 
 func (p *Parser) primary() Expr {
@@ -349,6 +414,7 @@ func (p *Parser) check(tokenType TokenType) bool {
 	if p.isAtEnd() {
 		return false
 	}
+	// fmt.Println(tokenType)
 	return p.peek().tokenType == tokenType
 }
 
